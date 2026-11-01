@@ -53,7 +53,7 @@ resource "aws_iam_role_policy" "ecs_task_execution_secrets" {
     Statement = [{
       Effect   = "Allow"
       Action   = ["secretsmanager:GetSecretValue"]
-      Resource = var.database_credentials_secret_arn
+      Resource = local.database_credentials_secret_arn
     }]
   })
 }
@@ -91,13 +91,13 @@ resource "aws_ecs_task_definition" "api" {
 
     environment = [
       { name = "MYSQL_DATABASE", value = var.database_name },
-      { name = "MYSQL_HOST", value = var.database_host },
+      { name = "MYSQL_HOST", value = local.database_host },
       { name = "MYSQL_PORT", value = tostring(var.database_port) }
     ]
 
     secrets = [
-      { name = "MYSQL_USER", valueFrom = "${var.database_credentials_secret_arn}:username::" },
-      { name = "MYSQL_PASSWORD", valueFrom = "${var.database_credentials_secret_arn}:password::" }
+      { name = "MYSQL_USER", valueFrom = "${local.database_credentials_secret_arn}:username::" },
+      { name = "MYSQL_PASSWORD", valueFrom = "${local.database_credentials_secret_arn}:password::" }
     ]
   }])
 

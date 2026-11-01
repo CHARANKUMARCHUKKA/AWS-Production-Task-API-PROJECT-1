@@ -26,24 +26,29 @@ Build and deploy a secure, monitored, and cost-conscious task management API usi
 - Local API and database integration
 - Docker-based development environment
 - Automated application tests
-- Terraform infrastructure setup in progress
+- Terraform infrastructure: VPC, subnets, ECR, ECS cluster, IAM roles, and guarded ALB/ECS
+- Amazon RDS for MySQL and Secrets Manager configuration with cost guards
+- One-off Alembic migration task definition for release automation
 - AWS deployment planned
 
 ## DEPLOYMENT SAFETY AND COSTS
 
-Terraform defaults to `enable_ecs_service = false`, so an infrastructure-only
-validation does not create a running Fargate service or Application Load
-Balancer. Enabling the service requires an immutable ECR image tag, an ACM
-certificate ARN, a MySQL endpoint, and a Secrets Manager secret with
-`username` and `password` JSON keys. Secrets are referenced by ARN only and
-are not stored in Terraform variables or source control.
+Terraform defaults to `enable_ecs_service = false`, `enable_rds = false`, and
+`enable_database_secrets = false`, so an infrastructure validation or baseline
+apply does not create running Fargate tasks, an Application Load Balancer, or an
+RDS instance.
 
-The production-style public entry point uses an ALB with HTTPS and a single
-Fargate task. An ALB's monthly cost alone is normally above a $10/month
-budget, before compute, logging, database, and data-transfer charges. Keep
-`enable_ecs_service` disabled outside short portfolio demonstrations, and
-destroy approved demo resources promptly. No `terraform apply` is run by this
-repository workflow.
+Enabling the service requires an immutable ECR image tag, an ACM certificate
+ARN, a MySQL endpoint, and a Secrets Manager secret with `username` and
+`password` JSON keys. When `enable_rds` and `enable_database_secrets` are set
+to `true`, Terraform manages a private, encrypted MySQL instance (`db.t4g.micro`)
+and generates credentials securely in Secrets Manager. Alternatively, external
+database host and secret ARNs can be supplied explicitly.
+
+An ALB and RDS instance incur hourly AWS charges. Keep `enable_ecs_service`,
+`enable_rds`, and `enable_database_secrets` disabled outside short portfolio
+demonstrations, and destroy approved demo resources promptly. No `terraform apply`
+is run by default in GitHub Actions workflows.
 
 ## DATABASE MIGRATIONS
 
@@ -92,9 +97,6 @@ network access before deploying new API tasks.
 
 ## FUTURE WORK
 
-- AWS networking and security
-- Amazon ECR and ECS Fargate
-- Amazon RDS for MySQL
-- GitHub Actions CI/CD with AWS OIDC
-- Amazon CloudWatch monitoring
+- GitHub Actions CI/CD deployment with AWS OIDC
+- Amazon CloudWatch alarms & observability dashboard
 - Infrastructure cost and security review

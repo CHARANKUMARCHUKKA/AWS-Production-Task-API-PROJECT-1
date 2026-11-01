@@ -27,6 +27,36 @@ variable "enable_ecs_service" {
   default     = false
 }
 
+variable "enable_rds" {
+  description = "Create the Amazon RDS MySQL instance. Disabled by default to avoid recurring database charges."
+  type        = bool
+  default     = false
+}
+
+variable "enable_database_secrets" {
+  description = "Create and manage database credentials in AWS Secrets Manager. Disabled by default to avoid recurring secret charges."
+  type        = bool
+  default     = false
+}
+
+variable "db_instance_class" {
+  description = "Compute and memory capacity class of the RDS MySQL instance."
+  type        = string
+  default     = "db.t4g.micro"
+}
+
+variable "db_allocated_storage" {
+  description = "Allocated storage in gigabytes for the RDS MySQL instance."
+  type        = number
+  default     = 20
+}
+
+variable "db_username" {
+  description = "Master username for the RDS MySQL instance."
+  type        = string
+  default     = "task_user"
+}
+
 variable "container_image_tag" {
   description = "Immutable ECR image tag to deploy. Supply a commit SHA or release version, never a mutable tag."
   type        = string

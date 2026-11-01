@@ -41,8 +41,8 @@ resource "aws_ecs_service" "api" {
     }
 
     precondition {
-      condition     = var.database_host != null && var.database_credentials_secret_arn != null
-      error_message = "Set database_host and database_credentials_secret_arn before enabling the ECS service."
+      condition     = local.database_host != null && local.database_credentials_secret_arn != null
+      error_message = "Set database_host and database_credentials_secret_arn (or enable managed RDS and database secrets) before enabling the ECS service."
     }
   }
 

@@ -33,6 +33,7 @@ output "database_security_group_id" {
   description = "Security group ID for the database."
   value       = aws_security_group.database.id
 }
+
 output "ecr_repository_url" {
   description = "URL of the ECR repository for the API image."
   value       = aws_ecr_repository.api.repository_url
@@ -46,4 +47,20 @@ output "ecs_cluster_name" {
 output "api_load_balancer_dns_name" {
   description = "Public DNS name of the API ALB when the ECS service is enabled."
   value       = try(aws_lb.api[0].dns_name, null)
+}
+
+output "database_endpoint" {
+  description = "Connection endpoint of the RDS MySQL instance."
+  value       = try(aws_db_instance.main[0].endpoint, null)
+}
+
+output "database_credentials_secret_arn" {
+  description = "Secrets Manager ARN holding database credentials."
+  value       = local.database_credentials_secret_arn
+  sensitive   = true
+}
+
+output "migration_task_definition_arn" {
+  description = "ARN of the Alembic migration task definition."
+  value       = try(aws_ecs_task_definition.migration[0].arn, null)
 }
